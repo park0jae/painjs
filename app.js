@@ -4,11 +4,12 @@ const colors = document.getElementsByClassName("jsColor");
 const range = document.getElementById("jsRange");
 const mode = document.getElementById("jsMode");
 const saveBtn = document.getElementById("jsSave");
-
+const eraseBtn = document.getElementById("jsErase");
+const clearBtn = document.getElementById("jsClear");
 
 const INITIAL_COLOR ="";
 const CANVAS_SIZE = 700;
-
+const RANGE_SIZE = 5;
 canvas.width = CANVAS_SIZE;
 canvas.height =CANVAS_SIZE;
 
@@ -16,11 +17,13 @@ ctx.fillStyle ="white";
 ctx.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
 ctx.strokeStyle = INITIAL_COLOR;
 ctx.fillStyle = INITIAL_COLOR;
-ctx.lineWidth = 5;
+ctx.lineWidth = RANGE_SIZE;
 
-
+let clearX = RANGE_SIZE;
+let clearY = RANGE_SIZE;
 let painting = false;
 let filling = false;
+let erasing = false;
 
 function stopPainting(){
     painting = false;
@@ -47,7 +50,11 @@ function onMouseMove(event){
             ctx.stroke();    
         }
     }
+    if(erasing){
+        ctx.clearRect(x,y,clearX,clearY);
+    }
 }
+
 
 if(canvas){
     // 캔버스 안에서 클릭했을 때 이벤트가 발생함 
@@ -57,12 +64,12 @@ if(canvas){
     canvas.addEventListener("mouseleave",  stopPainting);
     canvas.addEventListener("click",handleCanvasClick);
 }
+
 function handleCanvasClick(){
     if(filling){
         ctx.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
     }
 }
-
 
 function handleColorClick(event){
    const color = event.target.style.backgroundColor;
@@ -73,6 +80,8 @@ function handleColorClick(event){
 function handleRangeChange(event){
     const size = event.target.value;
     ctx.lineWidth = size;
+    clearX = size;
+    clearY = size;
 }
 
 function handleModeClick(){
@@ -91,6 +100,20 @@ function handleSaveClick(){
     link.download = "paintJS";
     link.click();
 }
+function handleEraseClick(){
+    if(!erasing){
+        erasing = true;
+        painting = false;
+        eraseBtn.style.background = "gray";
+    }else{
+        erasing = false;
+        painting = true;
+        eraseBtn.style.background = "white";
+    }
+}
+function handleClearClick(){
+    ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+}
 
 Array.from(colors).forEach(color => color.addEventListener("click",handleColorClick));
 
@@ -103,4 +126,11 @@ if(mode){
 }
 if(saveBtn){
     saveBtn.addEventListener("click",handleSaveClick);
+}
+
+if(eraseBtn){
+    eraseBtn.addEventListener("click",handleEraseClick);
+}
+if(clearBtn){
+    clearBtn.addEventListener("click",handleClearClick);
 }
